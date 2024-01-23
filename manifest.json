@@ -1,0 +1,11 @@
+{
+  "manifest_version": 2,
+  "name": "History Keyword Filter",
+  "version": "1.0",
+  "permissions": [
+    "history"
+  ],
+  "background": {
+    "scripts": ["dist/background.js"]
+  }
+}
