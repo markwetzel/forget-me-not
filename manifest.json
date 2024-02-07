@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "History Keyword Filter",
   "version": "1.0",
-  "permissions": ["history", "activeTab"],
+  "permissions": ["history", "storage"],
   "background": {
     "scripts": ["dist/background.js"]
   },
