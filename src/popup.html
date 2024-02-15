@@ -1,14 +1,28 @@
 <!DOCTYPE html>
 <html>
-  <body>
-    <h1>My Extension</h1>
-    <form id="block-form">
-      <label for="keyword">Block Keyword:</label><br>
-      <input type="text" id="keyword" name="keyword"><br>
-      <label for="domain">Block Domain:</label><br>
-      <input type="text" id="domain" name="domain"><br>
-      <input type="submit" value="Block">
-    </form>
-    <script src="popup.js"></script>
-  </body>
+<head>
+  <title>Settings</title>
+  <style>
+    .error {
+      color: red;
+      font-size: 0.9em;
+    }
+    /* Additional styling can be added here for better appearance */
+  </style>
+</head>
+<body>
+  <h1>Blocked Keywords</h1>
+  <ul id="keywords-list"></ul>
+  <input type="text" id="new-keyword" placeholder="Add new keyword">
+  <button id="add-keyword">Add Keyword</button>
+  <div id="keyword-error" class="error"></div>
+  
+  <h1>Blocked Domains</h1>
+  <ul id="domains-list"></ul>
+  <input type="text" id="new-domain" placeholder="Add new domain">
+  <button id="add-domain">Add Domain</button>
+  <div id="domain-error" class="error"></div>
+  
+  <script src="../dist/popup.js"></script>
+</body>
 </html>

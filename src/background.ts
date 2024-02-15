@@ -8,8 +8,9 @@ async function getBlockedKeywords(): Promise<string[]> {
   if (blockedKeywords.blockedKeywords) {
     return blockedKeywords.blockedKeywords;
   } else {
-    await browser.storage.local.set({ blockedKeywords: [] });
-    return [];
+    const defaultKeywords = ["gonewild", "superstonk", "gme"];
+    await browser.storage.local.set({ blockedKeywords: defaultKeywords });
+    return defaultKeywords;
   }
 }
 
@@ -19,10 +20,13 @@ async function getBlockedDomains(): Promise<string[]> {
   if (blockedDomains.blockedDomains) {
     return blockedDomains.blockedDomains;
   } else {
-    await browser.storage.local.set({
-      blockedDomains: ["reddit.com/r/gonewild", "reddit.com/r/superstonk"],
-    });
-    return [];
+    const defaultDomains = [
+      "reddit.com/r/gonewild",
+      "reddit.com/r/Superstonk",
+      "reddit-stream.com",
+    ];
+    await browser.storage.local.set({ blockedDomains: defaultDomains });
+    return defaultDomains; // Return the default list instead of []
   }
 }
 
@@ -38,15 +42,20 @@ export async function filterHistory(): Promise<void> {
       startTime: 0,
     });
 
-    console.log(`Found ${historyItems.length} history items`);
+    // console.log(`Found ${historyItems.length} history items`);
+    // console.log(`Blocked keywords: ${blockedKeywords}`);
+    // console.log(`Blocked domains: ${blockedDomains}`);
 
     for (const item of historyItems) {
-      if (
-        (item.url && shouldDeleteForDomain(item.url, blockedDomains)) ||
-        shouldDeleteForKeyword(item.url, blockedKeywords)
-      ) {
-        console.log(`Deleting ${item.url}`);
-        await browser.history.deleteUrl({ url: item.url! });
+      if (item.url) {
+        if (shouldDeleteForDomain(item.url, blockedDomains)) {
+          console.log(`Deleting ${item.url}`);
+          await browser.history.deleteUrl({ url: item.url! });
+        }
+        if (shouldDeleteForKeyword(item.url, blockedKeywords)) {
+          console.log(`Deleting ${item.url}`);
+          await browser.history.deleteUrl({ url: item.url! });
+        }
       }
     }
   } catch (error) {
@@ -55,20 +64,28 @@ export async function filterHistory(): Promise<void> {
 }
 
 function shouldDeleteForDomain(url: string, blockedDomains: string[]) {
-  return blockedDomains.some((domain: string) =>
-    url.toLowerCase().includes(domain.toLowerCase())
-  );
+  try {
+    const urlObj = new URL(url);
+    const domainWithSub = urlObj.hostname; // Gets 'example.com' from 'https://example.com/path'
+    return blockedDomains.some((domain) => domainWithSub.includes(domain));
+  } catch (error) {
+    console.error("Error parsing URL", error);
+    return false;
+  }
 }
 
 function shouldDeleteForKeyword(
   url: string | undefined,
   blockedKeywords: string[]
 ) {
-  return blockedKeywords.some((keyword: string) =>
-    url!.toLowerCase().includes(keyword.toLowerCase())
+  if (!url) return false; // If there's no URL, no need to proceed.
+
+  const urlLower = url.toLowerCase(); // Convert to lower case once for efficiency.
+  return blockedKeywords.some((keyword) =>
+    urlLower.includes(keyword.toLowerCase())
   );
 }
 
-const intervalInSeconds = 5;
+const intervalInSeconds = 10;
 setInterval(filterHistory, intervalInSeconds * 1000);
 console.log(`filterHistory will run every ${intervalInSeconds} seconds`);
