@@ -1,16 +1,13 @@
 import * as browser from "webextension-polyfill";
+import { PopupManager } from "./PopupManager";
 
-document.addEventListener("DOMContentLoaded", restoreOptions);
+document.addEventListener("DOMContentLoaded", () => {
+  // Initialize PopupManager
+  const popupManager = new PopupManager();
 
-const addKeywordButton = document.getElementById("add-keyword");
-if (addKeywordButton) {
-  addKeywordButton.addEventListener("click", addKeyword);
-}
-
-const addDomainButton = document.getElementById("add-domain");
-if (addDomainButton) {
-  addDomainButton.addEventListener("click", addDomain);
-}
+  // If there are other tasks to be performed on DOMContentLoaded, you can add them here.
+  // For example, if there's a need to interact with the DOM directly or initialize other components.
+});
 
 // Define interfaces for storage items for clarity and type checking
 interface StorageItem {
@@ -212,3 +209,5 @@ function setupEnterKeySubmission(): void {
     }
   });
 }
+
+

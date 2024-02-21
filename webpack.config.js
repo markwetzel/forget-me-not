@@ -2,8 +2,8 @@ const path = require("path");
 
 module.exports = {
   entry: {
-    background: "./src/background.ts", // Existing background script
-    popup: "./src/popup.ts", // Add this line for your popup script
+    background: "./src/background/background.ts", // Existing background script
+    popup: "./src/popup/popup.ts", // Add this line for your popup script
   },
   module: {
     rules: [
