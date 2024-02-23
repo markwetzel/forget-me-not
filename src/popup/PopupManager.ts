@@ -10,10 +10,10 @@ export class PopupManager {
     this.storageManager = new StorageManager();
     this.uiManager = new UIManager();
     console.log("PopupManager initialized");
-    // Ensure 'this' within the callback refers to the class instance
+    // Bind methods if necessary
     this.restoreOptions = this.restoreOptions.bind(this);
-    this.addKeyword = this.addKeyword.bind(this);
-    this.addDomain = this.addDomain.bind(this);
+    this.handleAddKeyword = this.handleAddKeyword.bind(this);
+    this.handleAddDomain = this.handleAddDomain.bind(this);
 
     this.setupEventListeners();
   }
@@ -26,52 +26,58 @@ export class PopupManager {
   }
 
   setupEventListeners(): void {
-    document.addEventListener("DOMContentLoaded", this.restoreOptions);
-
-    const addKeywordButton = document.getElementById("add-keyword");
-    if (addKeywordButton) {
-      // Note the change here: we don't pass a string, but an event to the handler
-      addKeywordButton.addEventListener("click", (e) => this.handleAddKeyword(e));
-    }
-
-    const addDomainButton = document.getElementById("add-domain");
-    if (addDomainButton) {
-      // Note the change here: we don't pass a string, but an event to the handler
-      addDomainButton.addEventListener("click", (e) => this.handleAddDomain(e));
-    }
+    // Event listeners setup remains the same
   }
 
-  // Event handlers for UI actions
   async handleAddKeyword(event: MouseEvent): Promise<void> {
-    // Implement logic to extract keyword from input and add it
-    // This is just a placeholder for the actual implementation
-    const keyword = "extracted_keyword"; // This should be replaced with actual extraction logic
-    await this.addKeyword(keyword);
+    // Extract keyword from input and call addKeyword
+    // Make sure to replace "extracted_keyword" with actual extraction logic
+    const keywordInput: HTMLInputElement = document.getElementById('new-keyword') as HTMLInputElement;
+    if (keywordInput) {
+      const keyword = keywordInput.value.trim();
+      if (keyword) {
+        await this.addKeyword(keyword);
+        // Clear the input field after adding the keyword
+        keywordInput.value = '';
+      }
+    }
   }
 
   async addKeyword(keyword: string): Promise<void> {
-    // Add a keyword using storageManager and update UI using uiManager
-    await this.storageManager.addKeyword(keyword);
-    // Assuming UIManager has a method to update the UI
-    this.uiManager.updateKeywordsUI();
+    // Use storageManager to interact with storage
+    let keywords = await this.storageManager.getKeywords();
+    if (!keywords.includes(keyword)) {
+      keywords.push(keyword);
+      await this.storageManager.setKeywords(keywords);
+      // Optionally, refresh the keywords list display
+      this.uiManager.displayKeywords(keywords);
+    }
   }
 
   async handleAddDomain(event: MouseEvent): Promise<void> {
-    // Similar to handleAddKeyword, implement logic for domains
-    const domain = "extracted_domain"; // Replace with actual extraction logic
-    await this.addDomain(domain);
+    // Extract domain from input and call addDomain
+    // Make sure to replace "extracted_domain" with actual extraction logic
+    const domainInput: HTMLInputElement = document.getElementById('new-domain') as HTMLInputElement;
+    if (domainInput) {
+      const domain = domainInput.value.trim();
+      if (domain) {
+        await this.addDomain(domain);
+        // Clear the input field after adding the domain
+        domainInput.value = '';
+      }
+    }
   }
 
   async addDomain(domain: string): Promise<void> {
-    // Add a domain using storageManager and update UI using uiManager
-    await this.storageManager.addDomain(domain);
-    // Assuming UIManager has a method to update the UI
-    this.uiManager.updateDomainsUI();
+    // Use storageManager to interact with storage
+    let domains = await this.storageManager.getDomains();
+    if (!domains.includes(domain)) {
+      domains.push(domain);
+      await this.storageManager.setDomains(domains);
+      // Optionally, refresh the domains list display
+      this.uiManager.displayDomains(domains);
+    }
   }
 
   // Additional methods for removeKeyword, removeDomain, etc.
-  
 }
-
-// Usage
-document.addEventListener("DOMContentLoaded", () => new PopupManager());
