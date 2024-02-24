@@ -1,4 +1,5 @@
 // src/popup/PopupManager.ts
+
 import { StorageManager } from "./StorageManager";
 import { UIManager } from "./UIManager";
 
@@ -10,12 +11,16 @@ export class PopupManager {
     this.storageManager = new StorageManager();
     this.uiManager = new UIManager();
     console.log("PopupManager initialized");
-    // Bind methods if necessary
+
     this.restoreOptions = this.restoreOptions.bind(this);
     this.handleAddKeyword = this.handleAddKeyword.bind(this);
     this.handleAddDomain = this.handleAddDomain.bind(this);
 
     this.setupEventListeners();
+
+    // Update UI with initial data
+    this.uiManager.updateKeywordsUI();
+    this.uiManager.updateDomainsUI();
   }
 
   async restoreOptions() {
@@ -26,58 +31,73 @@ export class PopupManager {
   }
 
   setupEventListeners(): void {
-    // Event listeners setup remains the same
+    const addKeywordButton = document.getElementById("add-keyword");
+    const addDomainButton = document.getElementById("add-domain");
+
+    if (addKeywordButton) {
+      addKeywordButton.addEventListener("click", this.handleAddKeyword);
+    } else {
+      console.error("Can't find the add-keyword button. Is it hiding?");
+    }
+
+    if (addDomainButton) {
+      addDomainButton.addEventListener("click", this.handleAddDomain);
+    } else {
+      console.error(
+        "Can't find the add-domain button. Maybe it's on a coffee break?"
+      );
+    }
   }
 
   async handleAddKeyword(event: MouseEvent): Promise<void> {
-    // Extract keyword from input and call addKeyword
-    // Make sure to replace "extracted_keyword" with actual extraction logic
-    const keywordInput: HTMLInputElement = document.getElementById('new-keyword') as HTMLInputElement;
+    const keywordInput: HTMLInputElement = document.getElementById(
+      "new-keyword"
+    ) as HTMLInputElement;
+    console.log(keywordInput);
+
     if (keywordInput) {
       const keyword = keywordInput.value.trim();
       if (keyword) {
         await this.addKeyword(keyword);
         // Clear the input field after adding the keyword
-        keywordInput.value = '';
+        keywordInput.value = "";
       }
     }
   }
 
   async addKeyword(keyword: string): Promise<void> {
-    // Use storageManager to interact with storage
     let keywords = await this.storageManager.getKeywords();
     if (!keywords.includes(keyword)) {
       keywords.push(keyword);
       await this.storageManager.setKeywords(keywords);
-      // Optionally, refresh the keywords list display
       this.uiManager.displayKeywords(keywords);
     }
   }
 
   async handleAddDomain(event: MouseEvent): Promise<void> {
-    // Extract domain from input and call addDomain
-    // Make sure to replace "extracted_domain" with actual extraction logic
-    const domainInput: HTMLInputElement = document.getElementById('new-domain') as HTMLInputElement;
+    const domainInput: HTMLInputElement = document.getElementById(
+      "new-domain"
+    ) as HTMLInputElement;
     if (domainInput) {
       const domain = domainInput.value.trim();
       if (domain) {
         await this.addDomain(domain);
-        // Clear the input field after adding the domain
-        domainInput.value = '';
+        domainInput.value = "";
       }
     }
   }
 
   async addDomain(domain: string): Promise<void> {
-    // Use storageManager to interact with storage
     let domains = await this.storageManager.getDomains();
     if (!domains.includes(domain)) {
       domains.push(domain);
       await this.storageManager.setDomains(domains);
-      // Optionally, refresh the domains list display
       this.uiManager.displayDomains(domains);
     }
   }
-
-  // Additional methods for removeKeyword, removeDomain, etc.
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  new PopupManager();
+  console.log("PopupManager instance created");
+});

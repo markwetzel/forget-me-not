@@ -1,6 +1,7 @@
 // src/background/BackgroundManager.ts
+
 import * as browser from "webextension-polyfill";
-import { StorageManager } from "../popup/StorageManager"; // Assuming StorageManager can be shared or adjusted for background use
+import { StorageManager } from "../popup/StorageManager";
 
 class BackgroundManager {
   private storageManager: StorageManager;
@@ -96,11 +97,11 @@ class BackgroundManager {
     url: string,
     blockedKeywords: string[]
   ): boolean {
-      // Ensure blockedKeywords is treated as an array
-  if (!Array.isArray(blockedKeywords)) {
-    console.error("blockedKeywords is not an array:", blockedKeywords);
-    return false;
-  }
+    // Ensure blockedKeywords is treated as an array
+    if (!Array.isArray(blockedKeywords)) {
+      console.error("blockedKeywords is not an array:", blockedKeywords);
+      return false;
+    }
     const urlLower = url.toLowerCase();
     return blockedKeywords.some((keyword) =>
       urlLower.includes(keyword.toLowerCase())
