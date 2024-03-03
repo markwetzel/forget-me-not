@@ -2,7 +2,21 @@
 
 import * as browser from "webextension-polyfill";
 
-export interface StorageItem {
+export interface BlockedDomain {
+  // "discriminated union"
+  type: "domain";
+  value: string;
+}
+
+export interface BlockedKeyword {
+  // ...or "tagged union"
+  type: "keyword";
+  value: string;
+}
+
+export type BlockedItem = BlockedDomain | BlockedKeyword;
+
+export interface StorageItems {
   id: string;
   name: string;
 }
@@ -11,7 +25,7 @@ export class StorageManager {
   private validateStorageItem(
     key: string,
     value: any
-  ): asserts value is StorageItem[] {
+  ): asserts value is BlockedItem[] {
     if (
       !Array.isArray(value) ||
       value.some((item) => typeof item !== "object")
@@ -22,7 +36,7 @@ export class StorageManager {
     }
   }
 
-  async getStorageItem(key: string): Promise<StorageItem[]> {
+  async getStorageItem(key: string): Promise<BlockedItem[]> {
     try {
       const result = await browser.storage.local.get(key);
       const deserializedValue = JSON.parse(result[key]);
@@ -34,7 +48,7 @@ export class StorageManager {
     }
   }
 
-  async setStorageItem(key: string, value: StorageItem[]): Promise<void> {
+  async setStorageItems(key: string, value: BlockedItem[]): Promise<void> {
     try {
       const serializedValue = JSON.stringify(value);
       await browser.storage.local.set({ [key]: serializedValue });
@@ -44,7 +58,7 @@ export class StorageManager {
     }
   }
 
-  async getKeywords(): Promise<StorageItem[]> {
+  async getKeywords(): Promise<BlockedItem[]> {
     try {
       const result = await this.getStorageItem("blockedKeywords");
       this.validateStorageItem("blockedKeywords", result);
@@ -55,7 +69,7 @@ export class StorageManager {
     }
   }
 
-  async getDomains(): Promise<StorageItem[]> {
+  async getDomains(): Promise<BlockedItem[]> {
     try {
       const result = await this.getStorageItem("blockedDomains");
       this.validateStorageItem("blockedDomains", result);
@@ -66,7 +80,7 @@ export class StorageManager {
     }
   }
 
-  private validateInput(input: any): asserts input is StorageItem[] {
+  private validateInput(input: any): asserts input is BlockedItem[] {
     if (
       !Array.isArray(input) ||
       input.some((item) => typeof item !== "object")
@@ -75,7 +89,7 @@ export class StorageManager {
     }
   }
 
-  async setKeywords(keywords: StorageItem[]): Promise<void> {
+  async setKeywords(keywords: BlockedItem[]): Promise<void> {
     try {
       this.validateInput(keywords);
       console.log("Setting blocked keywords to", keywords);
@@ -86,7 +100,7 @@ export class StorageManager {
     }
   }
 
-  async setDomains(domains: StorageItem[]): Promise<void> {
+  async setDomains(domains: BlockedItem[]): Promise<void> {
     try {
       this.validateInput(domains);
       console.log("Setting blocked domains to", domains);

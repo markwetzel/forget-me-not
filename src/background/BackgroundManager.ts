@@ -1,7 +1,7 @@
 // src/background/BackgroundManager.ts
 
 import * as browser from "webextension-polyfill";
-import { StorageManager } from "../popup/StorageManager";
+import { BlockedItem, StorageManager } from "../popup/StorageManager";
 
 class BackgroundManager {
   private storageManager: StorageManager;
@@ -21,7 +21,9 @@ class BackgroundManager {
   async initializeBlockedKeywords(): Promise<void> {
     let blockedKeywords = await this.storageManager.getKeywords();
     if (!blockedKeywords || blockedKeywords.length === 0) {
-      const defaultKeywords = ["gonewild", "superstonk", "gme"];
+      const defaultKeywords: BlockedItem[] = [
+        { type: "keyword", value: ["gonewild", "superstonk", "gme"] },
+      ];
       await this.storageManager.setStorageItem(
         "blockedKeywords",
         defaultKeywords

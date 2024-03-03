@@ -1,6 +1,6 @@
 // src/popup/UIManager.ts
 
-import { StorageItem, StorageManager } from "./StorageManager";
+import { BlockedItem, StorageManager } from "./StorageManager";
 
 export class UIManager {
   private storageManager: StorageManager;
@@ -9,14 +9,14 @@ export class UIManager {
     this.storageManager = new StorageManager();
   }
 
-  displayKeywords(keywords: StorageItem[]): void {
+  displayKeywords(keywords: BlockedItem[]): void {
     const keywordsList = document.getElementById("keywords-list");
     if (keywordsList) {
       keywordsList.innerHTML = "";
 
       keywords.forEach((keyword, index) => {
         const li = document.createElement("li");
-        li.textContent = `${keyword.name} (${keyword.id})`;
+        li.textContent = `${keyword.type} (${keyword.value.join(", ")})`;
 
         // Create a removal button for each keyword
         const removeButton = document.createElement("button");
@@ -29,14 +29,14 @@ export class UIManager {
     }
   }
 
-  displayDomains(domains: StorageItem[]): void {
+  displayDomains(domains: BlockedItem[]): void {
     const domainsList = document.getElementById("domains-list");
     if (domainsList) {
       domainsList.innerHTML = "";
 
       domains.forEach((domain, index) => {
         const li = document.createElement("li");
-        li.textContent = `${domain.name} (${domain.id})`;
+        li.textContent = `${domain.type} (${domain.value.join(", ")})`;
 
         // Create a removal button for each domain
         const removeButton = document.createElement("button");
