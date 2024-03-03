@@ -16,8 +16,7 @@ export class UIManager {
 
       keywords.forEach((keyword, index) => {
         const li = document.createElement("li");
-        li.textContent = `${keyword.type} (${keyword.value.join(", ")})`;
-
+        
         // Create a removal button for each keyword
         const removeButton = document.createElement("button");
         removeButton.textContent = "Remove";
@@ -36,7 +35,6 @@ export class UIManager {
 
       domains.forEach((domain, index) => {
         const li = document.createElement("li");
-        li.textContent = `${domain.type} (${domain.value.join(", ")})`;
 
         // Create a removal button for each domain
         const removeButton = document.createElement("button");

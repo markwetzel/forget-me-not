@@ -16,11 +16,6 @@ export interface BlockedKeyword {
 
 export type BlockedItem = BlockedDomain | BlockedKeyword;
 
-export interface StorageItems {
-  id: string;
-  name: string;
-}
-
 export class StorageManager {
   private validateStorageItem(
     key: string,
@@ -48,12 +43,63 @@ export class StorageManager {
     }
   }
 
-  async setStorageItems(key: string, value: BlockedItem[]): Promise<void> {
+
+  async addStorageItem(newItem: BlockedItem): Promise<void> {
     try {
-      const serializedValue = JSON.stringify(value);
-      await browser.storage.local.set({ [key]: serializedValue });
+      // Retrieve the existing list from localStorage
+      const key = newItem.type;
+      const storedValue = await browser.storage.local.get(key);
+      const currentItems = storedValue[key] ? JSON.parse(storedValue[key]) : [];
+
+      // Ensure we're working with an array and the newItem is not already included
+      if (!Array.isArray(currentItems)) {
+        console.error(`Existing data for key "${key}" is not an array.`);
+        return;
+      }
+
+      if (currentItems.includes(newItem.value)) {
+        console.log(`Item "${newItem.value}" is already in the list.`);
+        return;
+      }
+
+      // Add the new item to the array and update localStorage
+      const updatedItems = [...currentItems, newItem.value];
+      await browser.storage.local.set({ [key]: JSON.stringify(updatedItems) });
     } catch (e) {
-      console.error(`Failed to set storage item ${key}:`, e);
+      console.error(`Failed to add storage item of type ${newItem.type}:`, e);
+      throw e;
+    }
+  }
+
+  async removeStorageItem(itemToRemove: BlockedItem): Promise<void> {
+    try {
+      // Retrieve the existing list from localStorage
+      const key = itemToRemove.type;
+      const storedValue = await browser.storage.local.get(key);
+      const currentItems = storedValue[key] ? JSON.parse(storedValue[key]) : [];
+
+      // Ensure we're working with an array
+      if (!Array.isArray(currentItems)) {
+        console.error(`Existing data for key "${key}" is not an array.`);
+        return;
+      }
+
+      // Check if the item is in the array and remove it if present
+      const itemIndex = currentItems.indexOf(itemToRemove.value);
+      if (itemIndex !== -1) {
+        currentItems.splice(itemIndex, 1);
+        // Update localStorage with the new array
+        await browser.storage.local.set({
+          [key]: JSON.stringify(currentItems),
+        });
+      } else {
+        console.log(`Item "${itemToRemove.value}" not found in the list.`);
+      }
+    } catch (e) {
+      console.error(
+        `Failed to remove storage item of type ${itemToRemove.type}:`,
+        e
+      );
       throw e;
     }
   }

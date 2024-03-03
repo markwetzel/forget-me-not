@@ -21,9 +21,19 @@ class BackgroundManager {
   async initializeBlockedKeywords(): Promise<void> {
     let blockedKeywords = await this.storageManager.getKeywords();
     if (!blockedKeywords || blockedKeywords.length === 0) {
-      const defaultKeywords: BlockedItem[] = [
-        { type: "keyword", value: ["gonewild", "superstonk", "gme"] },
-      ];
+      // const defaultKeywords: BlockedItem[] = [
+      //   { type: "keyword", value: ["gonewild", "superstonk", "gme"] },
+      // ];
+
+      const defaultKeywords = ["gonewild", "superstonk", "gme"];
+
+      defaultKeywords.forEach(async (keyword) => {
+        await this.storageManager.setStorageItem("blockedKeywords", {
+          type: "keyword",
+          value: keyword,
+        });
+      }
+
       await this.storageManager.setStorageItem(
         "blockedKeywords",
         defaultKeywords
