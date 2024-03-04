@@ -65,15 +65,6 @@ export class PopupManager {
     }
   }
 
-  async addKeyword(keyword: string): Promise<void> {
-    let keywords = await this.storageManager.getKeywords();
-    if (!keywords.includes(keyword)) {
-      keywords.push(keyword);
-      await this.storageManager.setKeywords(keywords);
-      this.uiManager.displayKeywords(keywords);
-    }
-  }
-
   async handleAddDomain(event: MouseEvent): Promise<void> {
     const domainInput: HTMLInputElement = document.getElementById(
       "new-domain"
@@ -87,13 +78,22 @@ export class PopupManager {
     }
   }
 
+  async addKeyword(keyword: string): Promise<void> {
+    // let keywords = await this.storageManager.getKeywords();
+    // if (!keywords.includes(keyword)) {
+    //   keywords.push(keyword);
+    //   await this.storageManager.setKeywords(keywords);
+    //   this.uiManager.displayKeywords(keywords);
+    // }
+  }
+
   async addDomain(domain: string): Promise<void> {
-    let domains = await this.storageManager.getDomains();
-    if (!domains.includes(domain)) {
-      domains.push(domain);
-      await this.storageManager.setDomains(domains);
-      this.uiManager.displayDomains(domains);
-    }
+    // let domains = await this.storageManager.getDomains();
+    // if (!domains.includes(domain)) {
+    //   domains.push(domain);
+    //   await this.storageManager.setDomains(domains);
+    //   this.uiManager.displayDomains(domains);
+    // }
   }
 }
 

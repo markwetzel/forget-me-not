@@ -21,38 +21,34 @@ class BackgroundManager {
   async initializeBlockedKeywords(): Promise<void> {
     let blockedKeywords = await this.storageManager.getKeywords();
     if (!blockedKeywords || blockedKeywords.length === 0) {
-      // const defaultKeywords: BlockedItem[] = [
-      //   { type: "keyword", value: ["gonewild", "superstonk", "gme"] },
-      // ];
-
       const defaultKeywords = ["gonewild", "superstonk", "gme"];
 
       defaultKeywords.forEach(async (keyword) => {
-        await this.storageManager.setStorageItem("blockedKeywords", {
+        await this.storageManager.addStorageItem({
           type: "keyword",
           value: keyword,
         });
-      }
-
-      await this.storageManager.setStorageItem(
-        "blockedKeywords",
-        defaultKeywords
-      );
+      });
     }
   }
 
   async initializeBlockedDomains(): Promise<void> {
     let blockedDomains = await this.storageManager.getDomains();
+    // Check if blockedDomains are already initialized
     if (!blockedDomains || blockedDomains.length === 0) {
       const defaultDomains = [
         "reddit.com/r/gonewild",
         "reddit.com/r/Superstonk",
         "reddit-stream.com",
       ];
-      await this.storageManager.setStorageItem(
-        "blockedDomains",
-        defaultDomains
-      );
+
+      // Use addStorageItem for each domain to ensure they're added according to the new system
+      for (const domain of defaultDomains) {
+        await this.storageManager.addStorageItem({
+          type: "domain",
+          value: domain,
+        });
+      }
     }
   }
 
@@ -90,7 +86,7 @@ class BackgroundManager {
 
   private shouldDeleteForDomain(
     url: string,
-    blockedDomains: string[]
+    blockedDomains: BlockedItem[]
   ): boolean {
     try {
       if (!Array.isArray(blockedDomains)) {
@@ -98,7 +94,9 @@ class BackgroundManager {
         return false;
       }
       const urlObj = new URL(url);
-      return blockedDomains.some((domain) => urlObj.hostname.includes(domain));
+      return blockedDomains.some((domain) =>
+        urlObj.hostname.includes(domain.value)
+      );
     } catch (error) {
       console.error("Error parsing URL", error);
       return false;
@@ -107,7 +105,7 @@ class BackgroundManager {
 
   private shouldDeleteForKeyword(
     url: string,
-    blockedKeywords: string[]
+    blockedKeywords: BlockedItem[]
   ): boolean {
     // Ensure blockedKeywords is treated as an array
     if (!Array.isArray(blockedKeywords)) {
@@ -116,7 +114,7 @@ class BackgroundManager {
     }
     const urlLower = url.toLowerCase();
     return blockedKeywords.some((keyword) =>
-      urlLower.includes(keyword.toLowerCase())
+      urlLower.includes(keyword.value.toLowerCase())
     );
   }
 }
